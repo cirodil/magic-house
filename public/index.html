@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    <meta name="theme-color" content="#0288d1" />
+    <meta
+      name="description"
+      content="Управление волшебным деревянным домиком в вальдорфском стиле"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Волшебный Домик" />
+
+    <!-- iOS icons -->
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+    <link
+      rel="apple-touch-icon"
+      sizes="152x152"
+      href="/icons/icon-152x152.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/icons/icon-180x180.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="167x167"
+      href="/icons/icon-167x167.png"
+    />
+
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="/icons/icon-192x192.png" type="image/png" />
+
+    <!-- Preload critical assets -->
+    <link rel="preload" href="/static/media/house-icon.png" as="image" />
+
+    <title>Волшебный Домик</title>
+  </head>
+  <body>
+    <noscript>
+      <div
+        style="
+          text-align: center;
+          padding: 2rem;
+          font-family: Arial, sans-serif;
+        "
+      >
+        <h1>Волшебный Домик</h1>
+        <p>
+          Для работы приложения необходим JavaScript. Пожалуйста, включите его в
+          настройках браузера.
+        </p>
+        <p style="font-size: 0.9em; color: #666; margin-top: 1rem">
+          This application requires JavaScript to be enabled in your browser
+          settings.
+        </p>
+      </div>
+    </noscript>
+
+    <div id="root">
+      <div
+        style="
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          background: linear-gradient(135deg, #e0f7fa 0%, #bbdefb 100%);
+        "
+      >
+        <div
+          style="
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+          "
+        >
+          <div style="font-size: 3rem; margin-bottom: 1rem">✨</div>
+          <h1 style="color: #0288d1; font-size: 1.8rem; margin-bottom: 0.5rem">
+            Загрузка приложения...
+          </h1>
+          <p style="color: #546e7a; margin-bottom: 1.5rem">
+            Подготовка волшебного домика для вас
+          </p>
+          <div
+            style="
+              width: 60px;
+              height: 60px;
+              border: 5px solid #e0e0e0;
+              border-top: 5px solid #0288d1;
+              border-radius: 50%;
+              margin: 0 auto;
+              animation: spin 1s linear infinite;
+            "
+          ></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Простая анимация для загрузки (на случай, если JS не загрузится сразу)
+      const style = document.createElement("style");
+      style.textContent = `
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+          0% { opacity: 0.5; }
+          50% { opacity: 1; }
+          100% { opacity: 0.5; }
+        }
+      `;
+      document.head.appendChild(style);
+    </script>
+  </body>
+</html>
