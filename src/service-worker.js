@@ -1,3 +1,6 @@
+/* eslint-disable no-restricted-globals */
+/* eslint-disable no-undef */
+
 // service-worker.js
 const CACHE_NAME = "waldorf-house-v1.2";
 const urlsToCache = [
