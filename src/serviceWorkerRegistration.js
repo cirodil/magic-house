@@ -1,4 +1,6 @@
 // src/serviceWorkerRegistration.js
+// Этот файл генерируется автоматически при создании CRA-приложения
+
 const isLocalhost = Boolean(
   window.location.hostname === "localhost" ||
     window.location.hostname === "[::1]" ||
@@ -37,14 +39,15 @@ function registerValidSW(swUrl, config) {
     .then((registration) => {
       registration.onupdatefound = () => {
         const installingWorker = registration.installing;
-        if (installingWorker === null) {
+        if (installingWorker == null) {
           return;
         }
         installingWorker.onstatechange = () => {
           if (installingWorker.state === "installed") {
             if (navigator.serviceWorker.controller) {
               console.log(
-                "New content is available and will be used when all tabs for this page are closed."
+                "New content is available and will be used when all " +
+                  "tabs for this page are closed. See https://cra.link/PWA."
               );
               if (config && config.onUpdate) {
                 config.onUpdate(registration);
@@ -72,7 +75,7 @@ function checkValidServiceWorker(swUrl, config) {
       const contentType = response.headers.get("content-type");
       if (
         response.status === 404 ||
-        (contentType !== null && contentType.indexOf("javascript") === -1)
+        (contentType != null && contentType.indexOf("javascript") === -1)
       ) {
         navigator.serviceWorker.ready.then((registration) => {
           registration.unregister().then(() => {
