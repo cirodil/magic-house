@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Box, Typography, Slider, Paper } from "@mui/material";
 import { motion } from "framer-motion";
 import { useBle } from "../contexts/BleContext";
@@ -8,15 +8,20 @@ export default function RoomControl({ room, disabled }) {
   const [isTouched, setIsTouched] = useState(false);
   const { updateLight } = useBle();
 
-  const handleChange = async (event, newValue) => {
-    setBrightness(newValue);
-    try {
-      await updateLight(room.id, newValue);
-    } catch (error) {
-      console.error("Light update failed:", error);
-      setBrightness(0); // Reset on error
-    }
-  };
+  const handleChange = useCallback(
+    async (event, newValue) => {
+      const oldValue = brightness;
+      setBrightness(newValue);
+      try {
+        await updateLight(room.id, newValue);
+      } catch (error) {
+        console.error("Light update failed:", error);
+        // Восстанавливаем предыдущее значение вместо сброса в 0
+        setBrightness(oldValue);
+      }
+    },
+    [brightness, room.id, updateLight]
+  );
 
   const containerVariants = {
     hover: {
