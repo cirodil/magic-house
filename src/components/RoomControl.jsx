@@ -1,14 +1,12 @@
 import { useState } from "react";
-import { Box, Typography, Slider, Paper, useTheme } from "@mui/material";
+import { Box, Typography, Slider, Paper } from "@mui/material";
 import { motion } from "framer-motion";
 import { useBle } from "../contexts/BleContext";
-import LightIcon from "@mui/icons-material/WbSunny";
 
 export default function RoomControl({ room, disabled }) {
   const [brightness, setBrightness] = useState(0);
   const [isTouched, setIsTouched] = useState(false);
   const { updateLight } = useBle();
-  const theme = useTheme();
 
   const handleChange = async (event, newValue) => {
     setBrightness(newValue);

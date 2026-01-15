@@ -1,12 +1,5 @@
-import { useState, useRef } from "react";
-import {
-  Box,
-  Button,
-  TextField,
-  Typography,
-  useTheme,
-  Paper,
-} from "@mui/material";
+import { useState } from "react";
+import { Box, Button, TextField, Typography, Paper } from "@mui/material";
 import { motion } from "framer-motion";
 import StarIcon from "@mui/icons-material/Star";
 import CheckIcon from "@mui/icons-material/Check";
@@ -17,7 +10,6 @@ export default function ParentLock({ onSuccess }) {
   const [answer, setAnswer] = useState("");
   const [swipeSequence, setSwipeSequence] = useState([]);
   const [isComplete, setIsComplete] = useState(false);
-  const theme = useTheme();
 
   // Генерация простой математической задачи
   const [problem] = useState(() => {

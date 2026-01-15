@@ -19,8 +19,7 @@ import { useBle } from "../contexts/BleContext";
 import HouseIcon from "../assets/house-icon";
 
 export default function ChildInterface() {
-  const { device, connectionStatus, connectionError, isConnecting } = useBle();
-  const [isLoading, setIsLoading] = useState(false);
+  const { device, connectionStatus, connectionError } = useBle();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -35,10 +34,9 @@ export default function ChildInterface() {
     if (connectionStatus === "disconnected") {
       const timer = setTimeout(() => {
         if (connectionStatus === "disconnected") {
-          // Автоматическая попытка подключения через 2 секунды
           const lastDevice = localStorage.getItem("lastConnectedDevice");
           if (lastDevice) {
-            // connectToDevice будет вызван в другом месте или по кнопке
+            // Автоматическая попытка подключения будет в другом месте
           }
         }
       }, 2000);
@@ -46,54 +44,7 @@ export default function ChildInterface() {
     }
   }, [connectionStatus]);
 
-  if (isLoading || isConnecting) {
-    return (
-      <Box
-        display="flex"
-        flexDirection="column"
-        justifyContent="center"
-        alignItems="center"
-        height="100vh"
-        sx={{ background: "linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)" }}
-      >
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Box
-            sx={{
-              width: isMobile ? 120 : 180,
-              mb: 3,
-              "& svg": {
-                filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.2))",
-              },
-            }}
-          >
-            <HouseIcon size={isMobile ? 120 : 180} />
-          </Box>
-        </motion.div>
-
-        <ColorRing
-          visible={true}
-          height="80"
-          width="80"
-          ariaLabel="color-ring-loading"
-          wrapperStyle={{ margin: "20px 0" }}
-          colors={["#4CAF50", "#2196F3", "#FFC107", "#F44336"]}
-        />
-
-        <Typography
-          variant={isMobile ? "h6" : "h5"}
-          color="primary"
-          sx={{ mt: 2 }}
-        >
-          Подключаемся к волшебному домику...
-        </Typography>
-      </Box>
-    );
-  }
-
+  // Удалили неиспользуемый setIsLoading
   return (
     <Box
       sx={{
