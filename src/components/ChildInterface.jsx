@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import {
   Box,
   Grid,
@@ -9,7 +9,6 @@ import {
   Fab,
   Alert,
 } from "@mui/material";
-import { ColorRing } from "react-loader-spinner";
 import { motion } from "framer-motion";
 import RoomControl from "./RoomControl";
 import ConnectionStatus from "./ConnectionStatus";
