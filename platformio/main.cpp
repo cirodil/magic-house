@@ -1,6 +1,6 @@
 #include <BLEDevice.h>
-#include <BLEUtils.h>
 #include <BLEServer.h>
+#include <BLEUtils.h>
 #include <NeoPixelBus.h>
 
 #define LED_COUNT 4
@@ -18,43 +18,56 @@ NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(LED_COUNT, LED_PIN);
 BLECharacteristic *pRoom1Char, *pRoom2Char, *pRoom3Char, *pYardChar;
 
 class MyCallbacks : public BLECharacteristicCallbacks {
-  void onWrite(BLECharacteristic *pCharacteristic) {
-    std::string value = pCharacteristic->getValue();
-    if (value.length() > 0) {
-      uint8_t brightness = (uint8_t)value[0];
-      
-      if (pCharacteristic == pRoom1Char) strip.SetPixelColor(0, RgbColor(brightness, brightness, brightness));
-      else if (pCharacteristic == pRoom2Char) strip.SetPixelColor(1, RgbColor(brightness, brightness, brightness));
-      else if (pCharacteristic == pRoom3Char) strip.SetPixelColor(2, RgbColor(brightness, brightness, brightness));
-      else if (pCharacteristic == pYardChar) strip.SetPixelColor(3, RgbColor(brightness, brightness, brightness));
-      
-      strip.Show();
+  void onWrite(BLECharacteristic *pCharacteristic) override {
+    if (pCharacteristic->getLength() == 0) return;
+
+    uint8_t brightness = ((uint8_t*)pCharacteristic->getData())[0];
+
+    if (pCharacteristic == pRoom1Char) {
+      strip.SetPixelColor(0, RgbColor(brightness, brightness, brightness));
+    } else if (pCharacteristic == pRoom2Char) {
+      strip.SetPixelColor(1, RgbColor(brightness, brightness, brightness));
+    } else if (pCharacteristic == pRoom3Char) {
+      strip.SetPixelColor(2, RgbColor(brightness, brightness, brightness));
+    } else if (pCharacteristic == pYardChar) {
+      strip.SetPixelColor(3, RgbColor(brightness, brightness, brightness));
     }
+    strip.Show();
   }
 };
 
 void setup() {
-  strip.Begin();
-  strip.Show();
+  // Отладка (опционально)
+  Serial.begin(115200);
+  Serial.println("Starting WaldorfHouse BLE...");
 
+  // 1. Сначала инициализируем BLE
   BLEDevice::init("WaldorfHouse");
   BLEServer *pServer = BLEDevice::createServer();
-  
-  BLEService *pService = pServer->createService(SERVICE_UUID);
-  
-  pRoom1Char = pService->createCharacteristic(ROOM1_UUID, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE);
-  pRoom2Char = pService->createCharacteristic(ROOM2_UUID, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE);
-  pRoom3Char = pService->createCharacteristic(ROOM3_UUID, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE);
-  pYardChar = pService->createCharacteristic(YARD_UUID, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE);
 
-  pRoom1Char->setCallbacks(new MyCallbacks());
-  pRoom2Char->setCallbacks(new MyCallbacks());
-  pRoom3Char->setCallbacks(new MyCallbacks());
-  pYardChar->setCallbacks(new MyCallbacks());
+  BLEService *pService = pServer->createService(SERVICE_UUID);
+
+  pRoom1Char = pService->createCharacteristic(ROOM1_UUID, BLECharacteristic::PROPERTY_WRITE);
+  pRoom2Char = pService->createCharacteristic(ROOM2_UUID, BLECharacteristic::PROPERTY_WRITE);
+  pRoom3Char = pService->createCharacteristic(ROOM3_UUID, BLECharacteristic::PROPERTY_WRITE);
+  pYardChar = pService->createCharacteristic(YARD_UUID, BLECharacteristic::PROPERTY_WRITE);
+
+  MyCallbacks *callbacks = new MyCallbacks(); // один экземпляр для всех
+  pRoom1Char->setCallbacks(callbacks);
+  pRoom2Char->setCallbacks(callbacks);
+  pRoom3Char->setCallbacks(callbacks);
+  pYardChar->setCallbacks(callbacks);
 
   pService->start();
+
   BLEAdvertising *pAdvertising = pServer->getAdvertising();
   pAdvertising->start();
+
+  Serial.println("BLE advertising started");
+
+  // 2. Только ПОСЛЕ BLE инициализируем NeoPixel
+  strip.Begin();
+  strip.Show(); // выключить все светодиоды
 }
 
 void loop() {
