@@ -13,17 +13,18 @@
     "react-loader-spinner": "^5.4.5",
     "react-router-dom": "^6.18.0",
     "react-scripts": "5.0.1",
-    "web-animations-js": "^2.3.2",
-    "workbox-webpack-plugin": "^7.0.0"
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
-      "react-app"
+      "react-app",
+      "react-app/jest"
     ]
   },
   "browserslist": {
@@ -36,6 +37,35 @@
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
+    ]
+  },
+  "workbox": {
+    "globPatterns": [
+      "**/*.{js,css,html,png,jpg,svg,json}"
+    ],
+    "runtimeCaching": [
+      {
+        "urlPattern": "/static/.*",
+        "handler": "CacheFirst",
+        "options": {
+          "cacheName": "static-assets",
+          "expiration": {
+            "maxEntries": 50,
+            "maxAgeSeconds": 604800
+          }
+        }
+      },
+      {
+        "urlPattern": ".*",
+        "handler": "NetworkFirst",
+        "options": {
+          "cacheName": "api-cache",
+          "expiration": {
+            "maxEntries": 20,
+            "maxAgeSeconds": 86400
+          }
+        }
+      }
     ]
   }
 }

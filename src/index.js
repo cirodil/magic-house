@@ -14,4 +14,13 @@ root.render(
   </React.StrictMode>
 );
 
-serviceWorkerRegistration.register();
+// Регистрация сервис-воркера
+serviceWorkerRegistration.register({
+  onSuccess: (registration) => {
+    console.log("PWA успешно зарегистрирован и готов к работе в офлайн-режиме");
+  },
+  onUpdate: (registration) => {
+    console.log("Доступна новая версия приложения");
+    // Здесь можно показать уведомление пользователю о доступном обновлении
+  },
+});
