@@ -1,1 +1,4 @@
 node_modules/
+.pio/
+platformio.ini
+build/
