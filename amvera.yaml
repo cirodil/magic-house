@@ -1,5 +1,7 @@
 version: "1"
 name: waldorf-house
+meta:
+  toolchain: {}
 services:
   web:
     type: web
