@@ -4,3 +4,4 @@ platformio.ini
 platformio/
 project_context.py
 project_context.txt
+build/
