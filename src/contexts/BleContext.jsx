@@ -8,6 +8,7 @@ import {
 import {
   connectToDevice,
   setBrightness,
+  setColor,
   HOUSE_SERVICE_UUID,
   CHARACTERISTICS,
 } from "../utils/bleUtils";
@@ -19,7 +20,7 @@ export function BleProvider({ children }) {
   const [characteristics, setCharacteristics] = useState(null);
   const [connectionError, setConnectionError] = useState(null);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [connectionStatus, setConnectionStatus] = useState("disconnected"); // disconnected, connecting, connected, error
+  const [connectionStatus, setConnectionStatus] = useState("disconnected");
 
   const reconnectToDevice = useCallback(async (deviceId) => {
     setIsConnecting(true);
@@ -122,6 +123,33 @@ export function BleProvider({ children }) {
     }
   };
 
+  // Обновленная функция для установки цвета
+  const updateColor = async (room, color) => {
+    if (!device || !characteristics || !characteristics[room]) {
+      throw new Error("Устройство не подключено");
+    }
+
+    try {
+      await setColor(characteristics[room], color);
+    } catch (error) {
+      console.error("Update failed:", error);
+
+      if (
+        error.message.includes("GATT operation failed") ||
+        error.message.includes("device disconnected")
+      ) {
+        setDevice(null);
+        setCharacteristics(null);
+        setConnectionStatus("disconnected");
+        setConnectionError("Подключение потеряно. Переподключитесь к домику");
+        throw new Error("Подключение потеряно. Пожалуйста, переподключитесь.");
+      }
+
+      throw error;
+    }
+  };
+
+  // Функция для установки яркости (режим совместимости)
   const updateLight = async (room, value) => {
     if (!device || !characteristics || !characteristics[room]) {
       throw new Error("Устройство не подключено");
@@ -172,6 +200,7 @@ export function BleProvider({ children }) {
         connect,
         disconnect,
         updateLight,
+        updateColor,
       }}
     >
       {children}

@@ -13,7 +13,8 @@
     "react-loader-spinner": "^5.4.5",
     "react-router-dom": "^6.18.0",
     "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "@mui/lab": "^5.0.0-alpha.146"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -1,27 +1,57 @@
 import { useState, useCallback } from "react";
-import { Box, Typography, Slider, Paper } from "@mui/material";
+import { Box, Typography, Paper, Button } from "@mui/material";
 import { motion } from "framer-motion";
 import { useBle } from "../contexts/BleContext";
+import ColorPicker from "./ColorPicker";
 
 export default function RoomControl({ room, disabled }) {
-  const [brightness, setBrightness] = useState(0);
-  const [isTouched, setIsTouched] = useState(false);
-  const { updateLight } = useBle();
+  const [color, setColor] = useState({ r: 127, g: 127, b: 127 });
+  const [isOn, setIsOn] = useState(false);
+  const { updateColor, updateLight } = useBle();
 
-  const handleChange = useCallback(
-    async (event, newValue) => {
-      const oldValue = brightness;
-      setBrightness(newValue);
+  const handleColorChange = useCallback(
+    async (newColor) => {
+      const oldColor = color;
+      setColor(newColor);
+      setIsOn(newColor.r > 0 || newColor.g > 0 || newColor.b > 0);
+
       try {
-        await updateLight(room.id, newValue);
+        await updateColor(room.id, newColor);
       } catch (error) {
-        console.error("Light update failed:", error);
-        // Восстанавливаем предыдущее значение вместо сброса в 0
-        setBrightness(oldValue);
+        console.error("Color update failed:", error);
+        setColor(oldColor);
+        setIsOn(oldColor.r > 0 || oldColor.g > 0 || oldColor.b > 0);
       }
     },
-    [brightness, room.id, updateLight]
+    [color, room.id, updateColor],
   );
+
+  const handleToggle = useCallback(async () => {
+    const newState = !isOn;
+    const newColor = newState
+      ? { r: 255, g: 255, b: 255 }
+      : { r: 0, g: 0, b: 0 };
+
+    const oldColor = color;
+    const oldState = isOn;
+
+    setColor(newColor);
+    setIsOn(newState);
+
+    try {
+      if (newState) {
+        // Включаем с белым цветом
+        await updateColor(room.id, newColor);
+      } else {
+        // Выключаем
+        await updateColor(room.id, newColor);
+      }
+    } catch (error) {
+      console.error("Toggle failed:", error);
+      setColor(oldColor);
+      setIsOn(oldState);
+    }
+  }, [isOn, color, room.id, updateColor]);
 
   const containerVariants = {
     hover: {
@@ -34,11 +64,11 @@ export default function RoomControl({ room, disabled }) {
     },
   };
 
+  const rgbColor = `rgb(${color.r}, ${color.g}, ${color.b})`;
   const glowEffect = {
-    boxShadow:
-      brightness > 0
-        ? `0 0 15px ${room.color}, inset 0 0 10px ${room.color}`
-        : "0 4px 10px rgba(0,0,0,0.1)",
+    boxShadow: isOn
+      ? `0 0 20px ${rgbColor}, inset 0 0 15px ${rgbColor}40`
+      : "0 4px 10px rgba(0,0,0,0.1)",
   };
 
   return (
@@ -53,10 +83,9 @@ export default function RoomControl({ room, disabled }) {
         sx={{
           p: 2,
           height: "100%",
-          background:
-            brightness > 0
-              ? `linear-gradient(135deg, ${room.color}20 0%, ${room.color}10 100%)`
-              : "white",
+          background: isOn
+            ? `linear-gradient(135deg, ${rgbColor}20 0%, ${rgbColor}10 100%)`
+            : "white",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
@@ -68,7 +97,7 @@ export default function RoomControl({ room, disabled }) {
         }}
       >
         {/* Light beam effect */}
-        {brightness > 0 && (
+        {isOn && (
           <Box
             sx={{
               position: "absolute",
@@ -76,7 +105,7 @@ export default function RoomControl({ room, disabled }) {
               left: 0,
               right: 0,
               height: "30%",
-              background: `linear-gradient(to bottom, ${room.color}80, transparent)`,
+              background: `linear-gradient(to bottom, ${rgbColor}80, transparent)`,
               pointerEvents: "none",
             }}
           />
@@ -87,7 +116,8 @@ export default function RoomControl({ room, disabled }) {
             sx={{
               fontSize: "2.5rem",
               mb: 1,
-              filter: brightness > 0 ? "drop-shadow(0 0 10px white)" : "none",
+              filter: isOn ? "drop-shadow(0 0 10px white)" : "none",
+              opacity: isOn ? 1 : 0.5,
             }}
           >
             {room.icon}
@@ -97,79 +127,80 @@ export default function RoomControl({ room, disabled }) {
             variant="subtitle1"
             fontWeight="bold"
             sx={{
-              color: brightness > 0 ? "white" : "#0288d1",
-              textShadow:
-                brightness > 0 ? "0 0 5px rgba(255,255,255,0.7)" : "none",
+              color: isOn ? "#0288d1" : "#546e7a",
+              textShadow: isOn ? "0 0 5px rgba(255,255,255,0.7)" : "none",
             }}
           >
             {room.name}
           </Typography>
-
-          <Typography
-            variant="caption"
-            sx={{
-              color: brightness > 0 ? "rgba(255,255,255,0.9)" : "#546e7a",
-              mt: 0.5,
-            }}
-          >
-            {brightness}% яркости
-          </Typography>
         </Box>
 
-        <Box sx={{ px: 1, mt: 1 }}>
-          <Slider
-            value={brightness}
-            onChange={handleChange}
-            min={0}
-            max={100}
-            disabled={disabled}
-            size="small"
-            track={false}
-            sx={{
-              color: room.color,
-              "& .MuiSlider-thumb": {
-                width: 20,
-                height: 20,
-                boxShadow:
-                  brightness > 0
-                    ? `0 0 8px ${room.color}`
-                    : "0 2px 4px rgba(0,0,0,0.2)",
-                "&:hover, &.Mui-focusVisible": {
-                  boxShadow: `0 0 12px ${room.color}`,
-                },
-              },
-              "& .MuiSlider-rail": {
-                opacity: disabled ? 0.3 : 0.5,
-                backgroundColor: disabled ? "#bdbdbd" : "#90a4ae",
-              },
-            }}
-            aria-labelledby={`room-${room.id}-slider`}
-            valueLabelDisplay="auto"
-            onMouseDown={() => setIsTouched(true)}
-            onTouchStart={() => setIsTouched(true)}
-            onMouseUp={() => setIsTouched(false)}
-            onTouchEnd={() => setIsTouched(false)}
-          />
-        </Box>
-
-        {/* Light indicator */}
+        {/* Color indicator */}
         <Box
           sx={{
             display: "flex",
             justifyContent: "center",
-            mt: 0.5,
-            opacity: isTouched ? 0 : 1,
-            transition: "opacity 0.3s",
+            alignItems: "center",
+            mb: 2,
           }}
         >
           <Box
             sx={{
-              width: 24,
-              height: 24,
+              width: 40,
+              height: 40,
               borderRadius: "50%",
-              backgroundColor: brightness > 0 ? room.color : "#e0e0e0",
-              border: `2px solid ${brightness > 0 ? room.color : "#90a4ae"}`,
-              boxShadow: brightness > 0 ? `0 0 10px ${room.color}` : "none",
+              backgroundColor: rgbColor,
+              border: `2px solid ${isOn ? rgbColor : "#90a4ae"}`,
+              boxShadow: isOn ? `0 0 15px ${rgbColor}` : "none",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "1.5rem",
+            }}
+          >
+            {isOn ? "✨" : "○"}
+          </Box>
+        </Box>
+
+        {/* Controls */}
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+          <ColorPicker
+            room={room}
+            onColorChange={handleColorChange}
+            disabled={disabled}
+          />
+
+          <Button
+            variant={isOn ? "contained" : "outlined"}
+            color={isOn ? "success" : "primary"}
+            onClick={handleToggle}
+            disabled={disabled}
+            sx={{
+              borderRadius: "12px",
+              textTransform: "none",
+              py: 1,
+            }}
+          >
+            {isOn ? "Выключить" : "Включить"}
+          </Button>
+        </Box>
+
+        {/* Status indicator */}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            mt: 1,
+            opacity: 0.8,
+          }}
+        >
+          <Box
+            sx={{
+              width: 8,
+              height: 8,
+              borderRadius: "50%",
+              backgroundColor: isOn ? "#4caf50" : "#bdbdbd",
+              animation: isOn ? "pulse 2s infinite" : "none",
             }}
           />
         </Box>

@@ -34,7 +34,7 @@ export async function connectToDevice() {
 
     if (error.name === "NotFoundError") {
       throw new Error(
-        "Домик не найден. Пожалуйста, включите его и попробуйте снова."
+        "Домик не найден. Пожалуйста, включите его и попробуйте снова.",
       );
     }
 
@@ -46,11 +46,24 @@ export async function connectToDevice() {
   }
 }
 
+// Функция для установки яркости (режим совместимости)
 export async function setBrightness(characteristic, value) {
   if (value < 0 || value > 255) {
     throw new Error("Brightness value must be between 0 and 255");
   }
 
   const buffer = new Uint8Array([value]);
+  await characteristic.writeValue(buffer);
+}
+
+// Новая функция для установки цвета
+export async function setColor(characteristic, color) {
+  const { r, g, b } = color;
+
+  if ([r, g, b].some((val) => val < 0 || val > 255)) {
+    throw new Error("Color values must be between 0 and 255");
+  }
+
+  const buffer = new Uint8Array([r, g, b]);
   await characteristic.writeValue(buffer);
 }
