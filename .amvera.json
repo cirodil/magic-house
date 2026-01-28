@@ -1,8 +1,0 @@
-{
-  "type": "static",
-  "build": "npm run build",
-  "output": "build",
-  "environment": {
-    "NODE_ENV": "production"
-  }
-}

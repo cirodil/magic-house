@@ -1,0 +1,18 @@
+version: "1"
+name: waldorf-house
+services:
+  web:
+    type: web
+    image: nginx:alpine
+    port: 80
+    healthcheck:
+      path: /
+      timeout: 5s
+      interval: 10s
+    resources:
+      cpu: 100m
+      memory: 128Mi
+    autoscaling:
+      min_replicas: 1
+      max_replicas: 3
+      target_cpu_utilization: 70
