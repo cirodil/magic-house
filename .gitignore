@@ -2,6 +2,5 @@ node_modules/
 .pio/
 platformio.ini
 platformio/
-build/
 project_context.py
 project_context.txt
