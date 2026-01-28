@@ -7,7 +7,7 @@ import ColorPicker from "./ColorPicker";
 export default function RoomControl({ room, disabled }) {
   const [color, setColor] = useState({ r: 127, g: 127, b: 127 });
   const [isOn, setIsOn] = useState(false);
-  const { updateColor, updateLight } = useBle();
+  const { updateColor } = useBle();
 
   const handleColorChange = useCallback(
     async (newColor) => {
